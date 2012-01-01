@@ -9,11 +9,11 @@
     </tr>
     <tr>
       <th>Groups:</th>
-      <td>{{/* .Groups */}}TODO</td>
+      <td>{{ range .Groups.Slice }}{{ . }} {{ end }}</td>
     </tr>
     <tr>
       <th>Licenses:</th>
-      <td>{{/* .Licenses */}}TODO</td>
+      <td>{{ range .Licenses.Slice }}{{ . }} {{ end }}</td>
     </tr>
     <tr>
       <th>Description:</th>
@@ -58,16 +58,18 @@
   </ul>
   </ul>
 </div>
-{{ if .Package.Files }}
 <div id="pkgfiles" class="listing">
   <h3 title="Files">Files listing</h3>
+  {{ if .Package.Files }}
   <ul>
   {{ range $fileinfo := .Package.Files }}
   <li><a href="file:///{{ $fileinfo.Name }}">/{{ $fileinfo.Name }}</a></li>
   {{ end }}
   </ul>
+  {{ else }}
+  <p>No information available.</p>
+  {{ end }}
 </div>
-{{ end }}
 {{ end }}
 
 {{ define "pkginfo.contents" }}

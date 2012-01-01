@@ -1,11 +1,13 @@
 package main
 
 import (
+	"errors"
 	alpm "github.com/remyoudompheng/go-alpm"
 	"net/http"
 )
 
 func init() {
+	http.HandleFunc("/", HandleHome)
 	http.HandleFunc("/repolist", HandleRepolist)
 	http.HandleFunc("/info", HandlePkgInfo)
 }
@@ -20,6 +22,19 @@ func getDbList() ([]alpm.Db, error) {
 		return nil, er
 	}
 	return dblist.Slice(), nil
+}
+
+var NoSuchPage = errors.New("undefined page")
+
+// HandleHome displays the homepage.
+func HandleHome(resp http.ResponseWriter, req *http.Request) {
+	logger.Printf("%s %s", req.Method, req.URL)
+	if req.URL.Path != "/" {
+		resp.WriteHeader(http.StatusNotFound)
+		ErrorPage(resp, CommonData{}, http.StatusNotFound, NoSuchPage)
+		return
+	}
+	Execute(resp, "homepage", CommonData{}, nil)
 }
 
 // HandleRepolist displays basic information about available sync DBs.
