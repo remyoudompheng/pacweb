@@ -63,7 +63,7 @@ p.center, td.center, th.center { text-align: center; }
 /* table generics */
 table { width: 100%; border-collapse: collapse; }
 table .wrap { white-space: normal; }
-th, td { white-space: nowrap; text-align: left; }
+th, td { text-align: left; }
 th { vertical-align: middle; font-weight: bold; }
 td { vertical-align: top; }
 ul { vertical-align: top; }

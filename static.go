@@ -2,23 +2,30 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 )
 
 const themeDir = "themes/arch"
+
+var logger = log.New(os.Stderr, "pacweb ", log.LstdFlags|log.Lshortfile)
 
 func staticServe(resp http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
 	relpath, er := filepath.Rel("/theme", path)
 
 	if er != nil {
-		resp.WriteHeader(404)
-		fmt.Fprintf(resp, "Error 404: %s\n", er)
+		resp.WriteHeader(http.StatusNotFound)
+		er = ErrorPage(resp, CommonData{}, http.StatusNotFound, er)
+		if er != nil {
+			logger.Printf("error: %s", er)
+		}
 		return
 	}
 
+	logger.Printf("%s %s -> %s", req.Method, req.URL, filepath.Join(themeDir, relpath))
 	http.ServeFile(resp, req, filepath.Join(themeDir, relpath))
 }
 
@@ -30,5 +37,6 @@ func init() {
 func main() {
 	listen := flag.String("http", "localhost:8070", "Address to listen on")
 	flag.Parse()
+	logger.Printf("starting HTTP server at %s", *listen)
 	http.ListenAndServe(*listen, nil)
 }

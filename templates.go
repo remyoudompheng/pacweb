@@ -2,6 +2,8 @@ package main
 
 import (
 	"io"
+	"net/http"
+	"runtime/debug"
 	"text/template"
 )
 
@@ -22,7 +24,8 @@ func init() {
 	// parse templates.
 	t := template.New("root")
 	t.Funcs(template.FuncMap{
-		"parity": Parity,
+		"parity":         Parity,
+		"httpStatusText": http.StatusText,
 	})
 	pacwebTemplate = template.Must(t.ParseGlob("templates/*.tpl"))
 }
@@ -38,4 +41,15 @@ type CommonData struct {
 
 func Execute(w io.Writer, tplName string, common CommonData, contents interface{}) error {
 	return pacwebTemplate.ExecuteTemplate(w, tplName, TplInput{common, contents})
+}
+
+type ErrorData struct {
+	StatusCode int
+	Error      error
+	Stack      string
+}
+
+func ErrorPage(w io.Writer, common CommonData, code int, err error) error {
+	contents := ErrorData{code, err, string(debug.Stack())}
+	return pacwebTemplate.ExecuteTemplate(w, "error", TplInput{common, contents})
 }
