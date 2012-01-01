@@ -10,9 +10,10 @@
       </tr>
     </thead>
     <tbody>
-      {{ range $idx, $pkg := $.Packages }}
+      {{ $repo := .Repo }}
+      {{ range $idx, $pkg := .Packages }}
       <tr class="{{ parity $idx }}">
-        <td><a href="/info?pkg={{ $pkg.Name }}&db=none">{{ $pkg.Name }}</a></td>
+        <td><a href="/info?pkg={{ $pkg.Name }}&db={{ $repo }}">{{ $pkg.Name }}</a></td>
         <td>{{ $pkg.Version }}</td>
         <td>{{ $pkg.Description }}</td>
       </tr>

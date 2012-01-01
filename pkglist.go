@@ -1,34 +1,16 @@
 package main
 
 import (
+	"fmt"
 	alpm "github.com/remyoudompheng/go-alpm"
 	"net/http"
 )
 
 func init() {
 	http.HandleFunc("/pkglist", HandlePkglist)
-	http.HandleFunc("/repolist", HandleRepolist)
-	http.HandleFunc("/info", HandlePkgInfo)
 }
 
-func getAlpm() (*alpm.Handle, error) {
-	h, er := alpm.Init("/", "/var/lib/pacman")
-	if er != nil {
-		return nil, er
-	}
-
-	// TODO: read /etc/pacman.conf
-	h.RegisterSyncDb("core", 0)
-	h.RegisterSyncDb("community", 0)
-	h.RegisterSyncDb("extra", 0)
-	h.RegisterSyncDb("multilib", 0)
-	h.RegisterSyncDb("testing", 0)
-	h.RegisterSyncDb("multilib-testing", 0)
-	h.RegisterSyncDb("community-testing", 0)
-	return h, er
-}
-
-func getPackages() ([]alpm.Package, error) {
+func getLocalPackages() ([]alpm.Package, error) {
 	h, er := getAlpm()
 	if er != nil {
 		return nil, er
@@ -40,47 +22,51 @@ func getPackages() ([]alpm.Package, error) {
 	return db.PkgCache().Slice(), nil
 }
 
-func HandlePkglist(resp http.ResponseWriter, req *http.Request) {
-	pkglist, er := getPackages()
-	if er != nil {
-		ErrorPage(resp, CommonData{}, http.StatusInternalServerError, er)
-		return
-	}
-	er = Execute(resp, "pkglist", CommonData{}, map[string]interface{}{
-		"Title":    "Installed packages",
-		"Packages": pkglist,
-	})
-	if er != nil {
-		ErrorPage(resp, CommonData{}, http.StatusInternalServerError, er)
-	}
-}
-
-func getDbList() ([]alpm.Db, error) {
+func getRepoPackages(repo string) ([]alpm.Package, error) {
 	h, er := getAlpm()
 	if er != nil {
 		return nil, er
 	}
-	dblist, er := h.SyncDbs()
+	db, er := h.RegisterSyncDb(repo, 0)
 	if er != nil {
 		return nil, er
 	}
-	return dblist.Slice(), nil
+	return db.PkgCache().Slice(), nil
 }
 
-func HandleRepolist(resp http.ResponseWriter, req *http.Request) {
-	dbs, er := getDbList()
+// HandlePkglist displays a list of packages, either from local DB or a sync DB.
+func HandlePkglist(resp http.ResponseWriter, req *http.Request) {
+	logger.Printf("%s %s", req.Method, req.URL)
+	er := req.ParseForm()
 	if er != nil {
 		ErrorPage(resp, CommonData{}, http.StatusInternalServerError, er)
 		return
 	}
 
-	er = Execute(resp, "repolist", CommonData{}, map[string]interface{}{
-		"Repos": dbs,
-	})
+	reponame := req.Form.Get("repo")
+	switch reponame {
+	case "", "local":
+		// Local packages.
+		pkglist, er := getLocalPackages()
+		if er == nil {
+			er = Execute(resp, "pkglist", CommonData{}, map[string]interface{}{
+				"Title":    "Installed packages",
+				"Repo":     "local",
+				"Packages": pkglist,
+			})
+		}
+	default:
+		// Remote packages.
+		pkglist, er := getRepoPackages(reponame)
+		if er == nil {
+			er = Execute(resp, "pkglist", CommonData{}, map[string]interface{}{
+				"Title":    fmt.Sprintf("Packages from repository [%s]", reponame),
+				"Repo":     reponame,
+				"Packages": pkglist,
+			})
+		}
+	}
 	if er != nil {
 		ErrorPage(resp, CommonData{}, http.StatusInternalServerError, er)
 	}
-}
-
-func HandlePkgInfo(resp http.ResponseWriter, req *http.Request) {
 }

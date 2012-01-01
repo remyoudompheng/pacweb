@@ -1,16 +1,16 @@
 package main
 
 import (
-	"flag"
-	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 )
 
 const themeDir = "themes/arch"
 
-var logger = log.New(os.Stderr, "pacweb ", log.LstdFlags|log.Lshortfile)
+func init() {
+	// register static resources.
+	http.HandleFunc("/theme/", staticServe)
+}
 
 func staticServe(resp http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
@@ -27,16 +27,4 @@ func staticServe(resp http.ResponseWriter, req *http.Request) {
 
 	logger.Printf("%s %s -> %s", req.Method, req.URL, filepath.Join(themeDir, relpath))
 	http.ServeFile(resp, req, filepath.Join(themeDir, relpath))
-}
-
-func init() {
-	// register static resources.
-	http.HandleFunc("/theme/", staticServe)
-}
-
-func main() {
-	listen := flag.String("http", "localhost:8070", "Address to listen on")
-	flag.Parse()
-	logger.Printf("starting HTTP server at %s", *listen)
-	http.ListenAndServe(*listen, nil)
 }

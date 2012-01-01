@@ -1,8 +1,12 @@
 package main
 
 import (
+	"errors"
+	"fmt"
+	alpm "github.com/remyoudompheng/go-alpm"
 	"io"
 	"net/http"
+	"reflect"
 	"runtime/debug"
 	"text/template"
 )
@@ -20,12 +24,28 @@ func Parity(x int) string {
 	panic("plouf")
 }
 
+func IsInstalled(p *alpm.Package) bool {
+	return p.DB().Name() == "local"
+}
+
+func SplitSlice(x interface{}) (y []interface{}, er error) {
+	t := reflect.ValueOf(x)
+	switch t.Kind() {
+	case reflect.Array, reflect.Slice:
+		half := (t.Len() + 1) / 2
+		first, second := t.Slice(0, half), t.Slice(half, t.Len())
+		return []interface{}{first, second}, nil
+	}
+	return nil, errors.New("not a slice")
+}
+
 func init() {
 	// parse templates.
 	t := template.New("root")
 	t.Funcs(template.FuncMap{
 		"parity":         Parity,
 		"httpStatusText": http.StatusText,
+		"isInstalled":    IsInstalled,
 	})
 	pacwebTemplate = template.Must(t.ParseGlob("templates/*.tpl"))
 }
@@ -51,5 +71,15 @@ type ErrorData struct {
 
 func ErrorPage(w io.Writer, common CommonData, code int, err error) error {
 	contents := ErrorData{code, err, string(debug.Stack())}
+	logger.Printf("error: %s", err)
 	return pacwebTemplate.ExecuteTemplate(w, "error", TplInput{common, contents})
+}
+
+func PanicPage(w io.Writer, panicData interface{}) {
+	switch x := panicData.(type) {
+	case error:
+		ErrorPage(w, CommonData{}, http.StatusInternalServerError, x)
+	default:
+		ErrorPage(w, CommonData{}, http.StatusInternalServerError, fmt.Errorf("%+v", x))
+	}
 }
