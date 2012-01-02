@@ -4,11 +4,11 @@ import (
 	"errors"
 	"fmt"
 	alpm "github.com/remyoudompheng/go-alpm"
+	"html/template"
 	"io"
 	"net/http"
 	"reflect"
 	"runtime/debug"
-	"text/template"
 )
 
 var pacwebTemplate *template.Template
@@ -26,17 +26,6 @@ func Parity(x int) string {
 
 func IsInstalled(p *alpm.Package) bool {
 	return p.DB().Name() == "local"
-}
-
-func SplitSlice(x interface{}) (y []interface{}, er error) {
-	t := reflect.ValueOf(x)
-	switch t.Kind() {
-	case reflect.Array, reflect.Slice:
-		half := (t.Len() + 1) / 2
-		first, second := t.Slice(0, half), t.Slice(half, t.Len())
-		return []interface{}{first, second}, nil
-	}
-	return nil, errors.New("not a slice")
 }
 
 func init() {

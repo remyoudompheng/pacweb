@@ -44,7 +44,7 @@
 <div id="pkgdeps" class="listing">
   <h3 title="Dependencies">Dependencies</h3>
   <ul>
-  {{ range $dep = .Package.Depends.Slice }}
+  {{ range $dep := .Package.Depends.Slice }}
   <li><a href="/info?pkg={{ $dep.Name }}&db={{ $repo }}">{{ $dep }}</a></li>
   {{ end }}
   </ul>
