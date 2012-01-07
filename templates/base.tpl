@@ -6,6 +6,9 @@
     <title>PacWeb: a package management front-end</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="/static/archweb.css" media="screen, projection" />
+    <script type="text/javascript" src="/static/jquery-1.4.4.min.js"></script>
+    <script type="text/javascript" src="/static/jquery.tablesorter.min.js"></script>
+    <script type="text/javascript" src="/static/pacweb.js"></script>
   </head>
   <body>
     <div id="archnavbar" class="{% block navbarclass %}anb-home{% endblock %}">

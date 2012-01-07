@@ -23,6 +23,17 @@ func Parity(x int) string {
 	panic("plouf")
 }
 
+// HumanSize formats a file size for human readability.
+func HumanSize(n int64) string {
+	switch {
+	case n > 1<<20:
+		return fmt.Sprintf("%.2f MiB", float64(n)/float64(1<<20))
+	default:
+		return fmt.Sprintf("%.0f kiB", float64(n)/float64(1<<10))
+	}
+	panic("impossible")
+}
+
 func IsInstalled(p *alpm.Package) bool {
 	return p.DB().Name() == "local"
 }
@@ -34,6 +45,7 @@ func init() {
 		"parity":         Parity,
 		"httpStatusText": http.StatusText,
 		"isInstalled":    IsInstalled,
+		"humanSize":      HumanSize,
 	})
 	pacwebTemplate = template.Must(t.ParseGlob("templates/*.tpl"))
 }
@@ -48,7 +60,11 @@ type CommonData struct {
 }
 
 func Execute(w io.Writer, tplName string, common CommonData, contents interface{}) error {
-	return pacwebTemplate.ExecuteTemplate(w, tplName, TplInput{common, contents})
+	err := pacwebTemplate.ExecuteTemplate(w, tplName, TplInput{common, contents})
+	if err != nil {
+		logger.Printf("template error: %s", err)
+	}
+	return err
 }
 
 type ErrorData struct {
