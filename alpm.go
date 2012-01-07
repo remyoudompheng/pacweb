@@ -24,6 +24,20 @@ func getDbList() ([]alpm.Db, error) {
 	return dblist.Slice(), nil
 }
 
+// forallFilenames iterates call() over all (relative) file paths
+// from packages in db.
+func forallFilenames(db alpm.Db, call func(string) error) error {
+	return db.PkgCache().ForEach(func(pkg alpm.Package) error {
+		for _, file := range pkg.Files() {
+			er := call(file.Name)
+			if er != nil {
+				return er
+			}
+		}
+		return nil
+	})
+}
+
 var NoSuchPage = errors.New("undefined page")
 
 // HandleHome displays the homepage.

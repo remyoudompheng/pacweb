@@ -7,7 +7,6 @@ import (
 	"html/template"
 	"io"
 	"net/http"
-	"reflect"
 	"runtime/debug"
 )
 
@@ -59,14 +58,26 @@ type ErrorData struct {
 }
 
 func ErrorPage(w io.Writer, common CommonData, code int, err error) error {
+	if err == nil {
+		err = nilError
+	}
 	contents := ErrorData{code, err, string(debug.Stack())}
-	logger.Printf("error: %s", err)
-	return pacwebTemplate.ExecuteTemplate(w, "error", TplInput{common, contents})
+	logger.Printf("error: %v", err)
+	err = pacwebTemplate.ExecuteTemplate(w, "error", TplInput{common, contents})
+	if err != nil {
+		logger.Printf("template error: %s", err)
+	}
+	return err
 }
+
+var nilError = errors.New("nil")
 
 func PanicPage(w io.Writer, panicData interface{}) {
 	switch x := panicData.(type) {
 	case error:
+		if x == nil {
+			x = nilError
+		}
 		ErrorPage(w, CommonData{}, http.StatusInternalServerError, x)
 	default:
 		ErrorPage(w, CommonData{}, http.StatusInternalServerError, fmt.Errorf("%+v", x))

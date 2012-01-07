@@ -63,7 +63,7 @@
   {{ if .Package.Files }}
   <ul>
   {{ range $fileinfo := .Package.Files }}
-  <li><a href="file:///{{ $fileinfo.Name }}">/{{ $fileinfo.Name }}</a></li>
+  <li><a href="/file/?path=/{{ $fileinfo.Name }}">/{{ $fileinfo.Name }}</a></li>
   {{ end }}
   </ul>
   {{ else }}
