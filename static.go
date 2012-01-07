@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"sync"
 )
 
 const staticDir = "static/"
@@ -18,6 +19,7 @@ func init() {
 }
 
 func staticServe(resp http.ResponseWriter, req *http.Request) {
+	logRequest(req)
 	path := req.URL.Path
 	relpath, er := filepath.Rel("/static", path)
 
@@ -30,7 +32,7 @@ func staticServe(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	logger.Printf("%s %s -> %s", req.Method, req.URL, filepath.Join(staticDir, relpath))
+	logger.Printf("static redirect %s -> %s", req.URL, filepath.Join(staticDir, relpath))
 	http.ServeFile(resp, req, filepath.Join(staticDir, relpath))
 }
 
@@ -39,14 +41,36 @@ var (
 	errNonPackageFile = errors.New("not from a package")
 )
 
+var (
+	filenames   = map[string]bool{}
+	filenamesOk = new(sync.Once)
+)
+
+func initFilenames() {
+	h := getAlpm()
+	db, er := h.LocalDb()
+	if er != nil {
+		panic(er)
+	}
+
+	forallFilenames(db, func(p string) error {
+		// p is relative to root.
+		filenames["/"+p] = true
+		return nil
+	})
+	logger.Printf("local filenames initialized with %d elements", len(filenames))
+}
+
 // isPackageFilepath decides whether a filename is from a package
 // (or only probably from a package.
 func isPackageFilepath(name string) bool {
-	return true
+	filenamesOk.Do(initFilenames)
+	t, ok := filenames[name]
+	return t && ok
 }
 
 func serveLocalFile(resp http.ResponseWriter, req *http.Request) {
-	logger.Printf("%s %s", req.Method, req.URL)
+	logRequest(req)
 	er := req.ParseForm()
 	if er != nil {
 		resp.WriteHeader(http.StatusInternalServerError)

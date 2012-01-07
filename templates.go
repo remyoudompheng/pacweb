@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	alpm "github.com/remyoudompheng/go-alpm"
@@ -59,12 +60,13 @@ type CommonData struct {
 	SysMessage string
 }
 
-func Execute(w io.Writer, tplName string, common CommonData, contents interface{}) error {
-	err := pacwebTemplate.ExecuteTemplate(w, tplName, TplInput{common, contents})
+func Execute(tplName string, common CommonData, contents interface{}) ([]byte, error) {
+	buf := bytes.NewBuffer(nil)
+	err := pacwebTemplate.ExecuteTemplate(buf, tplName, TplInput{common, contents})
 	if err != nil {
 		logger.Printf("template error: %s", err)
 	}
-	return err
+	return buf.Bytes(), err
 }
 
 type ErrorData struct {
