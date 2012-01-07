@@ -5,7 +5,7 @@
   <head>
     <title>PacWeb: a package management front-end</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <link rel="stylesheet" type="text/css" href="/theme/archweb.css" media="screen, projection" />
+    <link rel="stylesheet" type="text/css" href="/static/archweb.css" media="screen, projection" />
   </head>
   <body>
     <div id="archnavbar" class="{% block navbarclass %}anb-home{% endblock %}">

@@ -8,18 +8,18 @@ import (
 	"path/filepath"
 )
 
-const themeDir = "themes/arch"
+const staticDir = "static/"
 
 func init() {
 	// register static resources.
-	http.HandleFunc("/theme/", staticServe)
+	http.HandleFunc("/static/", staticServe)
 	// serve local files.
 	http.HandleFunc("/file/", serveLocalFile)
 }
 
 func staticServe(resp http.ResponseWriter, req *http.Request) {
 	path := req.URL.Path
-	relpath, er := filepath.Rel("/theme", path)
+	relpath, er := filepath.Rel("/static", path)
 
 	if er != nil {
 		resp.WriteHeader(http.StatusNotFound)
@@ -30,8 +30,8 @@ func staticServe(resp http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	logger.Printf("%s %s -> %s", req.Method, req.URL, filepath.Join(themeDir, relpath))
-	http.ServeFile(resp, req, filepath.Join(themeDir, relpath))
+	logger.Printf("%s %s -> %s", req.Method, req.URL, filepath.Join(staticDir, relpath))
+	http.ServeFile(resp, req, filepath.Join(staticDir, relpath))
 }
 
 var (
