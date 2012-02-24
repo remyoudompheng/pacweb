@@ -1,3 +1,4 @@
+// pacweb is a Web interface for ArchLinux package management.
 package main
 
 import (
