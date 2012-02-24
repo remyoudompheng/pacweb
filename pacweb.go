@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime/pprof"
+	"syscall"
 )
 
 var logger = log.New(os.Stderr, "pacweb ", log.LstdFlags|log.Lshortfile)
@@ -16,21 +17,22 @@ func logRequest(req *http.Request) {
 	logger.Printf("%s %s from %s", req.Method, req.URL, req.RemoteAddr)
 }
 
-var (
-	profile = flag.String("pprof", "", "Dump CPU profile at that path")
-)
+var profile string
+
+func init() {
+	flag.StringVar(&profile, "pprof", "", "Dump CPU profile at that path")
+}
 
 func sigHandle() {
-	for sig := range signal.Incoming {
+	incoming := make(chan os.Signal, 1)
+	signal.Notify(incoming, syscall.SIGTERM, syscall.SIGINT)
+	for sig := range incoming {
 		logger.Printf("caught signal %v", sig)
-		switch sig {
-		case os.SIGTERM, os.SIGINT:
-			if *profile != "" {
-				pprof.StopCPUProfile()
-			}
-			logger.Printf("exiting.")
-			os.Exit(1)
+		if profile != "" {
+			pprof.StopCPUProfile()
 		}
+		logger.Printf("exiting.")
+		os.Exit(1)
 	}
 }
 
@@ -38,8 +40,8 @@ func main() {
 	listen := flag.String("http", "localhost:8070", "Address to listen on")
 	flag.Parse()
 
-	if *profile != "" {
-		f, er := os.Create(*profile)
+	if profile != "" {
+		f, er := os.Create(profile)
 		if er != nil {
 			panic(er)
 		}
