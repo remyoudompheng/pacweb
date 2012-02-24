@@ -13,7 +13,7 @@
       {{ range $i, $db := $.Repos }}
       <tr class="{{ parity $i }}">
         <td><a href="/pkglist?repo={{ $db.Name }}">{{ $db.Name }}</a></td>
-        <td>{{/* TODO: URL */}}</td>
+        <td>{{ range $db.Servers }}<a href="{{ $ }}">{{ $ }}</a><br/>{{ end }}</td>
         <td>{{ len $db.PkgCache.Slice }} packages</td>
       </tr>
       {{ end }}
