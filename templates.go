@@ -13,17 +13,6 @@ import (
 
 var pacwebTemplate *template.Template
 
-// Parity is used to create alternating styles in tables.
-func Parity(x int) string {
-	switch x % 2 {
-	case 0:
-		return "even"
-	case 1:
-		return "odd"
-	}
-	panic("plouf")
-}
-
 // HumanSize formats a file size for human readability.
 func HumanSize(n int64) string {
 	switch {
@@ -43,7 +32,6 @@ func init() {
 	// parse templates.
 	t := template.New("root")
 	t.Funcs(template.FuncMap{
-		"parity":         Parity,
 		"httpStatusText": http.StatusText,
 		"isInstalled":    IsInstalled,
 		"humanSize":      HumanSize,

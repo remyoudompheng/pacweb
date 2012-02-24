@@ -18,7 +18,7 @@ $(document).ready(function() {
     <tbody>
       {{ $repo := .Repo }}
       {{ range $idx, $pkg := .Packages }}
-      <tr class="{{ parity $idx }}">
+      <tr>
         <td><a href="/info?pkg={{ $pkg.Name }}&db={{ $repo }}">{{ $pkg.Name }}</a></td>
         <td>{{ $pkg.Version }}</td>
         <td>{{ $pkg.Description }}</td>
