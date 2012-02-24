@@ -57,7 +57,7 @@ func HandlePkgInfo(resp http.ResponseWriter, req *http.Request) {
 	pkgname := req.Form.Get("pkg")
 	dbname := req.Form.Get("db")
 	respBytes, er := BuildPkgInfo(pkgname, dbname)
-	if er != nil {
+	if er == nil {
 		io.Copy(resp, bytes.NewBuffer(respBytes))
 	} else {
 		ErrorPage(resp, CommonData{}, http.StatusInternalServerError, er)
