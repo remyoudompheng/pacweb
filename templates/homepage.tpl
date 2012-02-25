@@ -10,14 +10,13 @@
         <th>Package</th><th>Repository</th><th>Install status</th>
       </tr>
     </thead>
-    Not implemented.
-    {{/*
+    {{ range $pkg := $.Latest }}
     <tr>
-      <td class="pkg-name"><a href="/info?pkg={{ name }}&db={{ repo }}">{{ name }} {{ version }}</a></td>
-      <td><a href="/pkglist?repo={{ repo }}">{{ repo }}</a></td>
-      <td>{{ state }}</td>
+      <td class="pkg-name"><a href="/info?pkg={{ $pkg.Name }}&db={{ $pkg.DB.Name }}">{{ $pkg.Name }} {{ $pkg.Version }}</a></td>
+      <td><a href="/pkglist?repo={{ $pkg.DB.Name }}">{{ $pkg.DB.Name }}</a></td>
+      <td>{{ installStatus $pkg }}</td>
     </tr>
-    */}}
+    {{ end }}
   </table>
 </div>
 
@@ -27,14 +26,13 @@
     <thead>
       <tr><th>Package name</th><th>Installed version</th><th>Available version</th></tr>
     </thead>
-    Not implemented.
-    {{/*
+    {{ range $name, $vers := $.Outdated }}
     <tr>
-      <td class="pkg-name">{{ name }}</td>
-      <td><a href="/info?db=local&pkg={{ name }}">{{ local_ver }}</a></td>
-      <td><a href="/info?db={{ repo }}&pkg={{ name }}">{{ "%s (%s)" % (repo_ver, repo) }}</a></td>
+      <td class="pkg-name">{{ $name }}</td>
+      <td><a href="/info?db=local&pkg={{ $name }}">{{ index $vers 0 }}</a></td>
+      <td><a href="/info?db={{ index $vers 2 }}&pkg={{ $name }}">{{ index $vers 1 }} ({{ index $vers 2 }})</a></td>
     </tr>
-    */}}
+    {{ end }}
   </table>
 </div>
 

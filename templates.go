@@ -24,8 +24,29 @@ func HumanSize(n int64) string {
 	panic("impossible")
 }
 
-func IsInstalled(p *alpm.Package) bool {
+func IsLocal(p *alpm.Package) bool {
 	return p.DB().Name() == "local"
+}
+
+func InstallStatus(p *alpm.Package) string {
+	alpmHandleLock.RLock()
+	defer alpmHandleLock.RUnlock()
+	localdb, err := getAlpm().LocalDb()
+	if err != nil {
+		return "could not found local DB"
+	}
+	localp, err := localdb.PkgByName(p.Name())
+	if err == nil && localp != nil {
+		switch cmp := alpm.VerCmp(p.Version(), localp.Version()); {
+		case cmp > 0:
+			return "Upgradable"
+		case cmp == 0:
+			return "Installed"
+		case cmp < 0:
+			return "Local version is newer"
+		}
+	}
+	return "Not installed"
 }
 
 func init() {
@@ -33,7 +54,8 @@ func init() {
 	t := template.New("root")
 	t.Funcs(template.FuncMap{
 		"httpStatusText": http.StatusText,
-		"isInstalled":    IsInstalled,
+		"isLocal":        IsLocal,
+		"installStatus":  InstallStatus,
 		"humanSize":      HumanSize,
 	})
 	pacwebTemplate = template.Must(t.ParseGlob("templates/*.tpl"))
