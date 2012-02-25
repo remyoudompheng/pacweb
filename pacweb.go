@@ -53,5 +53,6 @@ func main() {
 
 	go sigHandle()
 	logger.Printf("starting HTTP server at %s", *listen)
-	http.ListenAndServe(*listen, nil)
+	err := http.ListenAndServe(*listen, nil)
+	logger.Print(err)
 }
