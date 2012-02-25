@@ -22,13 +22,13 @@ func BuildPkgInfo(pkgname, dbname string) (resp []byte, er error) {
 		dbname = "local"
 		db, er = h.LocalDb()
 	default:
-		db, er = h.RegisterSyncDb(dbname, 0)
+		db, er = h.SyncDbByName(dbname)
 	}
 	if er != nil {
 		return
 	}
 
-	pkg, er = db.GetPkg(pkgname)
+	pkg, er = db.PkgByName(pkgname)
 	if er != nil {
 		return
 	}

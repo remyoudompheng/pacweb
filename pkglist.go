@@ -23,7 +23,7 @@ func getLocalPackages() ([]alpm.Package, error) {
 
 func getRepoPackages(repo string) ([]alpm.Package, error) {
 	h := getAlpm()
-	db, er := h.RegisterSyncDb(repo, 0)
+	db, er := h.SyncDbByName(repo)
 	if er != nil {
 		return nil, er
 	}
