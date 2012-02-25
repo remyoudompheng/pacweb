@@ -6,6 +6,7 @@ import (
 	alpm "github.com/remyoudompheng/go-alpm"
 	"io"
 	"net/http"
+	"os"
 	"sync"
 )
 
@@ -22,19 +23,19 @@ var (
 )
 
 func initAlpm() {
-	h, er := alpm.Init("/", "/var/lib/pacman")
-	if er != nil {
-		panic(er)
+	fconf, err := os.Open("/etc/pacman.conf")
+	if err != nil {
+		panic(err)
 	}
-
-	// TODO: read /etc/pacman.conf
-	h.RegisterSyncDb("core", 0)
-	h.RegisterSyncDb("community", 0)
-	h.RegisterSyncDb("extra", 0)
-	h.RegisterSyncDb("multilib", 0)
-	h.RegisterSyncDb("testing", 0)
-	h.RegisterSyncDb("multilib-testing", 0)
-	h.RegisterSyncDb("community-testing", 0)
+	defer fconf.Close()
+	conf, err := alpm.ParseConfig(fconf)
+	if err != nil {
+		panic(err)
+	}
+	h, err := conf.CreateHandle()
+	if err != nil {
+		panic(err)
+	}
 	alpmHandle = h
 }
 
