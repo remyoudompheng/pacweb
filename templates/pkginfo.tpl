@@ -33,12 +33,12 @@
     </tr>
     <tr>
       <th>Build date:</th>
-      <td>{{ .BuildDate }}</td>
+      <td>{{ timeFmt .BuildDate }}</td>
     </tr>
     {{ if isLocal . }}
     <tr>
       <th>Install date:</th>
-      <td>{{ .InstallDate }}</td>
+      <td>{{ timeFmt .InstallDate }}</td>
     </tr>
     <tr>
       <th>Install reason:</th>

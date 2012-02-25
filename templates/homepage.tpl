@@ -7,12 +7,14 @@
   <table>
     <thead>
       <tr>
-        <th>Package</th><th>Repository</th><th>Install status</th>
+        <th>Package</th><th>Packaging date</th>
+        <th>Repository</th><th>Install status</th>
       </tr>
     </thead>
     {{ range $pkg := $.Latest }}
     <tr>
       <td class="pkg-name"><a href="/info?pkg={{ $pkg.Name }}&db={{ $pkg.DB.Name }}">{{ $pkg.Name }} {{ $pkg.Version }}</a></td>
+      <td>{{ timeFmt $pkg.BuildDate }}</td>
       <td><a href="/pkglist?repo={{ $pkg.DB.Name }}">{{ $pkg.DB.Name }}</a></td>
       <td>{{ installStatus $pkg }}</td>
     </tr>

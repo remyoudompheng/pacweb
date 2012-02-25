@@ -9,9 +9,15 @@ import (
 	"io"
 	"net/http"
 	"runtime/debug"
+	"time"
 )
 
 var pacwebTemplate *template.Template
+
+// TEMPLATE FUNCTIONS
+
+// TimeFormat formats time according to a chosen format.
+func TimeFormat(t time.Time) string { return t.Format(time.RFC1123) }
 
 // HumanSize formats a file size for human readability.
 func HumanSize(n int64) string {
@@ -53,6 +59,7 @@ func init() {
 	// parse templates.
 	t := template.New("root")
 	t.Funcs(template.FuncMap{
+		"timeFmt":        TimeFormat,
 		"httpStatusText": http.StatusText,
 		"isLocal":        IsLocal,
 		"installStatus":  InstallStatus,
