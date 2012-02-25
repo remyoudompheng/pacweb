@@ -31,7 +31,15 @@
       <th>Installed size:</th>
       <td>{{ .ISize }} bytes</td>
     </tr>
-    {{ if isInstalled . }}
+    <tr>
+      <th>Build date:</th>
+      <td>{{ .BuildDate }}</td>
+    </tr>
+    {{ if isLocal . }}
+    <tr>
+      <th>Install date:</th>
+      <td>{{ .InstallDate }}</td>
+    </tr>
     <tr>
       <th>Install reason:</th>
       <td>{{ .Reason }}</td>
