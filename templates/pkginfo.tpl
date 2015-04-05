@@ -60,7 +60,7 @@
 <div id="pkgreqs" class="listing">
   <h3 title="Required by">Required by</h3>
   <ul>
-  {{ range $pkgname = .Package.ComputeRequiredBy }}
+  {{ range $pkgname := .Package.ComputeRequiredBy }}
   <li><a href="/info?pkg={{ $pkgname }}&db={{ $repo }}">{{ $pkgname }}</a></li>
   {{ end }}
   </ul>
