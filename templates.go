@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"embed"
 	"errors"
 	"fmt"
 	alpm "github.com/remyoudompheng/go-alpm"
@@ -55,6 +56,9 @@ func InstallStatus(p *alpm.Package) string {
 	return "Not installed"
 }
 
+//go:embed templates
+var templateData embed.FS
+
 func init() {
 	// parse templates.
 	t := template.New("root")
@@ -65,7 +69,7 @@ func init() {
 		"installStatus":  InstallStatus,
 		"humanSize":      HumanSize,
 	})
-	pacwebTemplate = template.Must(t.ParseGlob("templates/*.tpl"))
+	pacwebTemplate = template.Must(t.ParseFS(templateData, "templates/*.tpl"))
 }
 
 type TplInput struct {

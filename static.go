@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"errors"
 	"fmt"
 	"net/http"
@@ -9,7 +10,10 @@ import (
 	"sync"
 )
 
-const staticDir = "static/"
+//go:embed static
+var staticFS embed.FS
+
+var staticHandler = http.FileServer(http.FS(staticFS))
 
 func init() {
 	// register static resources.
@@ -20,20 +24,7 @@ func init() {
 
 func staticServe(resp http.ResponseWriter, req *http.Request) {
 	logRequest(req)
-	path := req.URL.Path
-	relpath, er := filepath.Rel("/static", path)
-
-	if er != nil {
-		resp.WriteHeader(http.StatusNotFound)
-		er = ErrorPage(resp, CommonData{}, http.StatusNotFound, er)
-		if er != nil {
-			logger.Printf("error: %s", er)
-		}
-		return
-	}
-
-	logger.Printf("static redirect %s -> %s", req.URL, filepath.Join(staticDir, relpath))
-	http.ServeFile(resp, req, filepath.Join(staticDir, relpath))
+	staticHandler.ServeHTTP(resp, req)
 }
 
 var (

@@ -1,2 +1,2 @@
 pacweb: $(wildcard *.go)
-	go build -x -o $@
+	go build -v -o $@
