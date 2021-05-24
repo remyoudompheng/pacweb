@@ -83,20 +83,7 @@
 {{ define "pkginfo.contents" }}
 <div id="pkgdetails" class="box">
   <h2>Package information: {{ .Package.Name }} {{ .Package.Version }}</h2>
-  {{/*
-  <div id="detailslinks" class="listing">
-    {% if actions %}
-    <div id="actionlist">
-      <h4>Package actions</h4>
-      <ul class="small">
-        {% for action, desc in actions %}
-        <li><a href="/info?pkg={{ pkg.name }}&db={{ repo }}&action={{ action }}">{{ desc }}</a></li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-  </div>
-  */}}
+
   <table id="pkginfo">
    {{ template "pkginfo.metadata" $.Package }}
   </table>

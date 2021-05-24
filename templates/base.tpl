@@ -1,17 +1,17 @@
 {{ define "base.header" }}
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <title>PacWeb: a package management front-end</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="/static/archweb.css" media="screen, projection" />
+    <link rel="icon" type="image/png" href="data:;" />
     <script type="text/javascript" src="/static/jquery-1.4.4.min.js"></script>
     <script type="text/javascript" src="/static/jquery.tablesorter.min.js"></script>
     <script type="text/javascript" src="/static/pacweb.js"></script>
   </head>
   <body>
-    <div id="archnavbar" class="{% block navbarclass %}anb-home{% endblock %}">
+    <div id="archnavbar">
         <div id="archnavbarlogo"><h1><a href="/" title="Return to the main page">Arch Linux</a></h1></div>
         <div id="archnavbarmenu">
             <ul id="archnavbarlist">
